@@ -1,0 +1,43 @@
+{
+    "variables": {
+        "region": "us-east-1",
+        "vpc_id": "vpc-0d0a6ed4b33c3ca7d",
+        "subnet_id": "subnet-0e8253a9030408cfe",
+        "instance_size": "t2.micro",
+        "source_ami": "ami-000db10762d0c4c05",
+        "security_group_id": "sg-0b2d5a1c948b5166d",
+        "ssh_username": "ec2-user"
+    },
+    "builders": [
+        {
+            "ami_name": "ami-inspector-{{timestamp}}",
+            "region": "{{user `region`}}",
+            "vpc_id": "{{user `vpc_id`}}",
+            "subnet_id": "{{user `subnet_id`}}",
+            "instance_type": "{{user `instance_size`}}",
+            "source_ami": "{{user `source_ami`}}",
+            "ssh_username": "{{user `ssh_username`}}",
+            "ssh_timeout": "3m",
+            "ssh_pty": "true",
+            "type": "amazon-ebs",
+            "security_group_id": "{{user `security_group_id`}}",
+            "ssh_interface": "public_ip",
+            "tags": {
+                "Name": "App Name",
+                "Environment": "Development",
+                "BuiltBy": "Packer"
+            }
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline":[
+                "echo 'Installing AWS Inspector' ",
+                "sudo yum update -y",
+                "sudo yum install -y git wget",
+                "/usr/bin/wget -O - https://inspector-agent.amazonaws.com/linux/latest/install | /bin/sudo /bin/bash"
+            ]
+        }
+    ]
+}
